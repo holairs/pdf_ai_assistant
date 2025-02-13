@@ -1,42 +1,134 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+:root {
+  --space: 1rem;
+  --bg: #09090b;
+  --fg: #e3e3e3;
+  --surface-1: #101012;
+  --surface-2: #27272a;
+  --surface-3: #52525b;
+  --ease-out: cubic-bezier(0.5, 1, 0.89, 1);
+  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+body {
+  display: grid;
+  color: var(--fg);
+  background: var(--bg);
+  padding: var(--space);
+  min-height: 100vh;
+  place-items: center;
+}
+
+main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px; /* Espacio entre el input y el botón */
+}
+
+/* Textbox minimalista */
+.minimal-input {
+  background: transparent;
+  border: 2px solid var(--surface-2);
+  padding: 10px 15px;
+  font-size: 1rem;
+  color: var(--fg);
+  border-radius: 5px;
+  outline: none;
+  transition: border-color 300ms var(--ease-out);
+  width: 400px;
+  height: 200px;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+/* Efecto cuando se enfoca el input */
+.minimal-input:focus {
+  border-color: var(--active-color);
 }
 
 .card {
-  padding: 2em;
+  --active-color: #fef08a;
+  position: relative; /* 📌 Permite posicionar elementos dentro */
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  aspect-ratio: 4/5;
+  border: 1px solid var(--surface-2);
+  border-radius: 5px;
+  padding: 2rem;
+  transition: border-color 200ms var(--ease-out);
+  user-select: none;
+  width: 370px;
+  height: 10px;
+  text-align: center;
+  cursor: pointer;
 }
 
-.read-the-docs {
-  color: #888;
+/* Asegurar que pixel-canvas se expanda y esté detrás */
+pixel-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0; /* 📌 Mantiene la animación en el fondo */
+}
+
+/* Texto "ENVIAR" centrado sobre la animación */
+.button-text {
+  position: absolute;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--surface-3);
+  z-index: 1; /* 📌 Lo pone por encima de pixel-canvas */
+  transition: color 300ms var(--ease-out), transform 300ms var(--ease-out);
+}
+
+/* Botón oculto */
+button {
+  display: none;
+}
+
+/* Hover: cambia el color del borde y el texto */
+.card:hover {
+  border-color: var(--active-color);
+}
+
+.card:hover .button-text {
+  color: var(--active-color);
+  transform: scale(1.1);
+}
+
+.response {
+  margin-top: 10px;
+  font-size: 14px;
+  color: white;
+}
+
+.header-title {
+  font-size: 2rem; /* Tamaño grande pero no exagerado */
+  font-weight: 600; /* Semi-negrita para un look profesional */
+  text-transform: uppercase; /* Mayúsculas para dar más presencia */
+  letter-spacing: 1px; /* Espaciado elegante */
+  color: #fde047; /* Amarillo EY */
+  text-align: center; /* Centrado */
+  margin-bottom: 1rem; /* Espaciado inferior */
+  position: relative;
+}
+
+/* Línea decorativa debajo del título */
+.header-title::after {
+  content: "";
+  display: block;
+  width: 80px;
+  height: 4px;
+  background-color: #fde047; /* Amarillo EY */
+  margin: 8px auto 0;
+  border-radius: 2px;
 }

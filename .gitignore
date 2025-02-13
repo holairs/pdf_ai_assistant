@@ -1,3 +1,4 @@
 pdf_ai_assistant_ui/node_modules
 pdf_ai_assistant_backend/.venv
 pdf_ai_assistant_backend/__pycache__
+pdf_ai_assistant_ui/.idea
