@@ -16,7 +16,7 @@ function App() {
 
     try {
       const response = await sendDataToServer(inputValue);
-      setResponseMessage(`✅ Enviado: ${response.message}`);
+      setResponseMessage(`✅ ${response.ai_response}`);
     } catch (error) {
       setResponseMessage("❌ Error al enviar, intenta de nuevo.");
     } finally {
@@ -27,9 +27,8 @@ function App() {
   return (
     <>
       <div className="wrapper">
-        <h1 className="header-title">EY Employee Finder Assistant</h1>
-        <input
-          type="text"
+        <h1 className="header-title">Employee Finder Assistant</h1>
+        <textarea
           className="minimal-input"
           placeholder="Escribe aquí..."
           value={inputValue}
@@ -47,7 +46,7 @@ function App() {
             {/* @ts-ignore */}
           </pixel-canvas>
 
-          <span className="button-text">{loading ? "Enviando..." : "ENVIAR"}</span>
+          <span className="button-text">{loading ? "Enviando..." : "Enviar"}</span>
 
         </div>
         {responseMessage && <p className="response">{responseMessage}</p>}
