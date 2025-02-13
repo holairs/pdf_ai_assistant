@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./App.css";
 import { sendDataToServer } from "./services/api.js";
 import "./components/pixel-canvas.js";
+import ReactMarkdown from 'react-markdown';
 
 function App() {
 
@@ -49,7 +50,11 @@ function App() {
           <span className="button-text">{loading ? "Enviando..." : "Enviar"}</span>
 
         </div>
-        {responseMessage && <p className="response">{responseMessage}</p>}
+        {responseMessage && (
+          <div className="response">
+            <ReactMarkdown>{responseMessage}</ReactMarkdown>
+          </div>
+        )}
       </div>
     </>
   );
