@@ -1,32 +1,46 @@
-# extraction.py
-
-from io import BytesIO
+import os
 from PyPDF2 import PdfReader
-
 from open_ai import ai_consult
 
-async def get_pdf_data(file):
+PDF_FOLDER = os.path.join(os.path.expanduser("~"), "Downloads/CVS_Test/")
+
+async def process_pdfs(prompt: str):
+    print("📡 Recibida petición en /request_employee")
+    print("📜 Cuerpo recibido:", {"prompt": prompt})
+
+    pdf_data = {}
+    open_ai_response = "Error: No se pudo procesar ningún PDF"  # Defatult value
+
     try:
-        contents = await file.read()
-        pdf_file = BytesIO(contents)
-        pdf_reader = PdfReader(pdf_file)
-        text = ""
-        for page in pdf_reader.pages:
-            text += page.extract_text()
-        return text
-    except Exception as e:
-        print(f"Error while processing the PDF: {e}")
-        return None
+        print(f"🎯 Procesando PDFs en {PDF_FOLDER} con el prompt: {prompt}")
 
-async def upload_files(files):
-    pdf_data: Dict[str, str] = {}
+        # List directory PDFs 
+        for filename in os.listdir(PDF_FOLDER):
+            if filename.endswith(".pdf"):
+                pdf_path = os.path.join(PDF_FOLDER, filename)
+                try:
+                    with open(pdf_path, "rb") as pdf_file:
+                        reader = PdfReader(pdf_file)
+                        text = "\n".join([page.extract_text() or "" for page in reader.pages])
 
-    for file in files:
-        text = await get_pdf_data(file)
-        if text:
-            pdf_data[file.filename] = text
+                        # Contents as str
+                        if not isinstance(text, str):
+                            raise ValueError(f"The {filename} content is not a valid str.")
+
+                        pdf_data[filename] = text
+                except Exception as e:
+                    print(f"❌ Error while processing {filename}: {e}")
+
+        if pdf_data:
+            formatted_data = {
+                "prompt": prompt,
+                "pdfs": pdf_data
+            }
+            open_ai_response = ai_consult(formatted_data)  # Formated values
         else:
-            pdf_data[file.filename] = "Error while processing the PDF"
+            print("⚠️ Not enough files to process.")
 
-    open_ai_response = ai_consult(str(pdf_data))
+    except Exception as e:
+        print(f"❌ Error in FastAPI: {e}")
+
     return {"ai_response": open_ai_response}

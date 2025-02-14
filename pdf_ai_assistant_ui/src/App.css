@@ -7,18 +7,16 @@
   --surface-3: #52525b;
   --ease-out: cubic-bezier(0.5, 1, 0.89, 1);
   --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+  --active-color: #fef08a;
 }
 
 body {
-  display: grid;
+  margin: 0;
+  padding: var(--space);
   color: var(--fg);
   background: var(--bg);
-  padding: var(--space);
   min-height: 100vh;
-  place-items: center;
-}
-
-main {
+  /* Centrar globalmente todo el contenido */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -28,108 +26,14 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px; /* Espacio entre el input y el botón */
-}
-
-.minimal-input {
-  background: transparent;
-  border: 2px solid var(--surface-2);
-  padding: 10px 15px;
-  font-size: 1rem;
-  color: var(--fg);
-  border-radius: 5px;
-  outline: none;
-  transition: border-color 300ms var(--ease-out);
-  width: 400px;
-  height: 200px;
-  text-align: left;
-  resize: none;
-  overflow-y: auto;
-  word-wrap: break-word;
-  white-space: pre-wrap;
-}
-
-.minimal-input:focus {
-  border-color: var(--active-color);
-}
-
-.card {
-  --active-color: #fef08a;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  aspect-ratio: 4/5;
-  border: 1px solid var(--surface-2);
-  border-radius: 5px;
-  padding: 2rem;
-  transition: border-color 200ms var(--ease-out);
-  user-select: none;
-  width: 370px;
-  height: 10px;
-  text-align: center;
-  cursor: pointer;
-}
-
-pixel-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
+  /* Para demo: límite de ancho */
+  max-width: 1200px;
   width: 100%;
-  height: 100%;
-  z-index: 0;
 }
 
-.button-text {
-  position: absolute;
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: var(--surface-3);
-  z-index: 1; /* "Enviar" button overposition on pixel-canvas */
-  transition: color 300ms var(--ease-out), transform 300ms var(--ease-out);
-}
-
-button {
-  display: none;
-}
-
-.card:hover {
-  border-color: var(--active-color);
-}
-
-.card:hover .button-text {
-  color: var(--active-color);
-  transform: scale(1.1);
-}
-
-.response {
-  background: var(--surface-1);
-  color: var(--fg);
-  border-left: 4px solid var(--active-color);
-  padding: 15px;
-  font-size: 1rem;
-  border-radius: 5px;
-  max-width: 400px;
-  text-align: left;
-  margin-top: 15px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  animation: fadeIn 0.3s ease-out;
-  line-height: 1.4;
-  word-wrap: break-word;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
+/* ----------------------------------
+   TÍTULO 
+-------------------------------------*/
 .header-title {
   font-size: 2rem;
   font-weight: 600;
@@ -149,4 +53,168 @@ button {
   background-color: #fde047;
   margin: 8px auto 0;
   border-radius: 2px;
+}
+
+/* ----------------------------------
+   CONTENEDOR PRINCIPAL
+   * Versión inicial (sin respuesta) => centrado en columna
+   * Versión con respuesta => dos columnas
+-------------------------------------*/
+.main-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.5s var(--ease-in-out);
+  /* puedes ajustar la altura que necesites */
+  width: 100%;
+  max-width: 900px;
+}
+
+/* Cuando tenemos respuesta, cambiamos a dos columnas */
+.main-container.has-response {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+/* ----------------------------------
+   SECCIÓN DE INPUT Y BOTÓN
+-------------------------------------*/
+.input-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.5s var(--ease-in-out);
+  /* En estado normal, está al centro */
+}
+
+/* En modo "has-response", podemos darle un pequeño ajuste
+   o dejarlo tal cual, según prefieras */
+.main-container.has-response .input-section {
+  /* Ejemplo: lo "empujamos" un poco a la izquierda (opcional) */
+  transform: translateX(-5%);
+}
+
+/* ----------------------------------
+   EL TEXTAREA
+-------------------------------------*/
+.minimal-input {
+  background: transparent;
+  border: 2px solid var(--surface-2);
+  padding: 10px 15px;
+  font-size: 1rem;
+  color: var(--fg);
+  border-radius: 5px;
+  outline: none;
+  transition: border-color 300ms var(--ease-out);
+  width: 400px;
+  height: 200px;
+  text-align: left;
+  resize: none;
+  overflow-y: auto;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  margin-bottom: 10px;
+}
+
+.minimal-input:focus {
+  border-color: var(--active-color);
+}
+
+/* ----------------------------------
+   EL BOTÓN (card)
+-------------------------------------*/
+.card {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  aspect-ratio: 4/5;
+  border: 1px solid var(--surface-2);
+  border-radius: 5px;
+  padding: 2rem;
+  transition: border-color 200ms var(--ease-out);
+  user-select: none;
+  width: 370px;
+  height: 10px;
+  text-align: center;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.card:hover {
+  border-color: var(--active-color);
+}
+
+pixel-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.button-text {
+  position: absolute;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--surface-3);
+  z-index: 1; /* "Enviar" sobre pixel-canvas */
+  transition: color 300ms var(--ease-out), transform 300ms var(--ease-out);
+}
+
+.card:hover .button-text {
+  color: var(--active-color);
+  transform: scale(1.1);
+}
+
+/* ----------------------------------
+   SECCIÓN DE RESPUESTA 
+-------------------------------------*/
+.response-section {
+  /* 
+    En modo inicial (sin respuesta), no está visible. Podrías
+    incluso darle un transform para que venga "desde la derecha".
+  */
+  opacity: 0;
+  transform: translateX(30px);
+  transition: all 0.5s var(--ease-in-out);
+  max-width: 400px; 
+  width: 100%;
+  /* Espacio arriba si está en columna */
+  margin-top: 1rem;
+}
+
+/* Cuando tenemos respuesta, aparece */
+.main-container.has-response .response-section {
+  opacity: 1;
+  transform: translateX(0);
+  margin-top: 0; /* en layout horizontal no hace falta */
+}
+
+.response {
+  background: var(--surface-1);
+  color: var(--fg);
+  border-left: 4px solid var(--active-color);
+  padding: 15px;
+  font-size: 1rem;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  line-height: 1.4;
+  word-wrap: break-word;
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Animación de fadeIn */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
