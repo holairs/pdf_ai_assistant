@@ -5,15 +5,10 @@ from open_ai import ai_consult
 PDF_FOLDER = os.path.join(os.path.expanduser("~"), "Downloads/CVS_Test/")
 
 async def process_pdfs(prompt: str):
-    print("📡 Recibida petición en /request_employee")
-    print("📜 Cuerpo recibido:", {"prompt": prompt})
-
     pdf_data = {}
     open_ai_response = "Error: No se pudo procesar ningún PDF"  # Defatult value
 
     try:
-        print(f"🎯 Procesando PDFs en {PDF_FOLDER} con el prompt: {prompt}")
-
         # List directory PDFs 
         for filename in os.listdir(PDF_FOLDER):
             if filename.endswith(".pdf"):

@@ -26,48 +26,36 @@ class Pixel {
 
   draw() {
     const centerOffset = this.maxSizeInteger * 0.5 - this.size * 0.5;
-
     this.ctx.fillStyle = this.color;
-    this.ctx.fillRect(
-      this.x + centerOffset,
-      this.y + centerOffset,
-      this.size,
-      this.size
-    );
+    this.ctx.fillRect(this.x + centerOffset, this.y + centerOffset, this.size, this.size);
   }
 
   appear() {
     this.isIdle = false;
-
     if (this.counter <= this.delay) {
       this.counter += this.counterStep;
       return;
     }
-
     if (this.size >= this.maxSize) {
       this.isShimmer = true;
     }
-
     if (this.isShimmer) {
       this.shimmer();
     } else {
       this.size += this.sizeStep;
     }
-
     this.draw();
   }
 
   disappear() {
     this.isShimmer = false;
     this.counter = 0;
-
     if (this.size <= 0) {
       this.isIdle = true;
       return;
     } else {
       this.size -= 0.1;
     }
-
     this.draw();
   }
 
@@ -77,7 +65,6 @@ class Pixel {
     } else if (this.size <= this.minSize) {
       this.isReverse = false;
     }
-
     if (this.isReverse) {
       this.size -= this.speed;
     } else {
@@ -102,37 +89,23 @@ class PixelCanvas extends HTMLElement {
     }
   `;
 
+  constructor() {
+    super();
+    this.forceAnimation = false; // Controla si la animación se mantiene activa sin hover
+  }
+
   get colors() {
     return this.dataset.colors?.split(",") || ["#f8fafc", "#f1f5f9", "#cbd5e1"];
   }
 
   get gap() {
     const value = this.dataset.gap || 5;
-    const min = 4;
-    const max = 50;
-
-    if (value <= min) {
-      return min;
-    } else if (value >= max) {
-      return max;
-    } else {
-      return parseInt(value);
-    }
+    return Math.max(4, Math.min(parseInt(value), 50));
   }
 
   get speed() {
     const value = this.dataset.speed || 35;
-    const min = 0;
-    const max = 100;
-    const throttle = 0.001;
-
-    if (value <= min || this.reducedMotion) {
-      return min;
-    } else if (value >= max) {
-      return max * throttle;
-    } else {
-      return parseInt(value) * throttle;
-    }
+    return Math.max(0, Math.min(parseInt(value), 100)) * 0.001;
   }
 
   get noFocus() {
@@ -142,26 +115,22 @@ class PixelCanvas extends HTMLElement {
   connectedCallback() {
     const canvas = document.createElement("canvas");
     const sheet = new CSSStyleSheet();
-
-    this._parent = this.parentNode;
     this.shadowroot = this.attachShadow({ mode: "open" });
-
     sheet.replaceSync(PixelCanvas.css);
-
     this.shadowroot.adoptedStyleSheets = [sheet];
     this.shadowroot.append(canvas);
+
     this.canvas = this.shadowroot.querySelector("canvas");
     this.ctx = this.canvas.getContext("2d");
     this.timeInterval = 1000 / 60;
     this.timePrevious = performance.now();
-    this.reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
+    this.reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     this.init();
     this.resizeObserver = new ResizeObserver(() => this.init());
     this.resizeObserver.observe(this);
 
+    this._parent = this.parentNode;
     this._parent.addEventListener("mouseenter", this);
     this._parent.addEventListener("mouseleave", this);
 
@@ -189,21 +158,36 @@ class PixelCanvas extends HTMLElement {
   }
 
   onmouseenter() {
-    this.handleAnimation("appear");
+    if (!this.forceAnimation) {
+      this.handleAnimation("appear");
+    }
   }
 
   onmouseleave() {
-    this.handleAnimation("disappear");
+    if (!this.forceAnimation) {
+      this.handleAnimation("disappear");
+    }
   }
 
   onfocusin(e) {
-    if (e.currentTarget.contains(e.relatedTarget)) return;
-    this.handleAnimation("appear");
+    if (!this.forceAnimation && !e.currentTarget.contains(e.relatedTarget)) {
+      this.handleAnimation("appear");
+    }
   }
 
   onfocusout(e) {
-    if (e.currentTarget.contains(e.relatedTarget)) return;
-    this.handleAnimation("disappear");
+    if (!this.forceAnimation && !e.currentTarget.contains(e.relatedTarget)) {
+      this.handleAnimation("disappear");
+    }
+  }
+
+  setForceAnimation(state) {
+    this.forceAnimation = state;
+    if (state) {
+      this.handleAnimation("appear"); // Mantiene la animación activa
+    } else {
+      this.handleAnimation("disappear"); // Vuelve al comportamiento normal
+    }
   }
 
   handleAnimation(name) {
@@ -227,38 +211,26 @@ class PixelCanvas extends HTMLElement {
   getDistanceToCanvasCenter(x, y) {
     const dx = x - this.canvas.width / 2;
     const dy = y - this.canvas.height / 2;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    return distance;
+    return Math.sqrt(dx * dx + dy * dy);
   }
 
   createPixels() {
     for (let x = 0; x < this.canvas.width; x += this.gap) {
       for (let y = 0; y < this.canvas.height; y += this.gap) {
-        const color = this.colors[
-          Math.floor(Math.random() * this.colors.length)
-        ];
-        const delay = this.reducedMotion
-          ? 0
-          : this.getDistanceToCanvasCenter(x, y);
-
-        this.pixels.push(
-          new Pixel(this.canvas, this.ctx, x, y, color, this.speed, delay)
-        );
+        const color = this.colors[Math.floor(Math.random() * this.colors.length)];
+        const delay = this.reducedMotion ? 0 : this.getDistanceToCanvasCenter(x, y);
+        this.pixels.push(new Pixel(this.canvas, this.ctx, x, y, color, this.speed, delay));
       }
     }
   }
 
   animate(fnName) {
     this.animation = requestAnimationFrame(() => this.animate(fnName));
-
     const timeNow = performance.now();
     const timePassed = timeNow - this.timePrevious;
-
     if (timePassed < this.timeInterval) return;
 
     this.timePrevious = timeNow - (timePassed % this.timeInterval);
-
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     for (let i = 0; i < this.pixels.length; i++) {

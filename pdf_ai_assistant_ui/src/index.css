@@ -35,6 +35,129 @@ h1 {
   line-height: 1.1;
 }
 
+/* ✅ Contenedor Principal */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+  padding: 20px;
+}
+
+.input-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* ✅ Estilos del Textarea */
+.minimal-input {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 2px solid #646cff;
+  background: #1a1a1a;
+  color: white;
+  resize: none;
+  transition: all 0.3s ease-in-out;
+}
+
+.minimal-input:focus {
+  outline: none;
+  border-color: #eab308;
+  box-shadow: 0 0 10px #fde047;
+}
+
+/* ✅ Botón con Pixel Canvas */
+.card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 50px;
+  background: #1a1a1a;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  margin-top: 15px;
+}
+
+.card:hover {
+  border-color: #eab308;
+}
+
+/* ✅ Animación cuando está en estado "Enviando..." */
+.card.loading {
+  border-color: #eab308; /* Mantiene el borde resaltado */
+  animation: pulse-border 1.5s infinite alternate ease-in-out;
+}
+
+.card.loading .button-text {
+  color: #fde047; /* Cambia el color del texto mientras se envía */
+  font-weight: bold;
+  animation: text-glow 1.5s infinite alternate ease-in-out;
+}
+
+/* ✅ Animaciones */
+@keyframes pulse-border {
+  0% {
+    border-color: #fef08a;
+    box-shadow: 0 0 10px #fde047;
+  }
+  100% {
+    border-color: #eab308;
+    box-shadow: 0 0 20px #eab308;
+  }
+}
+
+@keyframes text-glow {
+  0% {
+    text-shadow: 0 0 5px #fef08a;
+  }
+  100% {
+    text-shadow: 0 0 10px #fde047;
+  }
+}
+
+/* ✅ Sección de Respuesta */
+.response-section {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.response {
+  padding: 15px;
+  background: #1a1a1a;
+  /*border: 2px solid #646cff;*/
+  border-radius: 8px;
+  color: white;
+  font-size: 1rem;
+  transition: all 0.3s ease-in-out;
+}
+
+/* ✅ Animación para la respuesta cuando está en "Enviando..." */
+.card.loading + .response-section .response {
+  border-color: #eab308;
+  box-shadow: 0 0 10px #fde047;
+  animation: pulse-border 1.5s infinite alternate ease-in-out;
+}
+
+/* ✅ Estilos de los botones */
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -46,14 +169,17 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
 button:hover {
   border-color: #646cff;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+/* ✅ Modo Claro */
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -64,5 +190,31 @@ button:focus-visible {
   }
   button {
     background-color: #f9f9f9;
+  }
+
+  .minimal-input {
+    background: #f9f9f9;
+    color: #213547;
+    border-color: #646cff;
+  }
+
+  .response {
+    background: #f9f9f9;
+    color: #213547;
+    /*border-color: #646cff;*/
+  }
+
+  .card {
+    background: #f9f9f9;
+    color: #213547;
+  }
+
+  .card.loading {
+    border-color: #eab308;
+    box-shadow: 0 0 20px #eab308;
+  }
+
+  .card.loading .button-text {
+    color: #eab308;
   }
 }
