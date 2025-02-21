@@ -4,9 +4,10 @@
   border-right: 1px solid var(--surface-2);
   padding: 1rem;
   width: 250px;
-  height: 100%; /* Ocupará el 100% del contenedor padre */
+  height: auto;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .chat-navbar h2 {
@@ -43,3 +44,4 @@
   font-size: 0.9rem;
   color: var(--surface-3);
 }
+

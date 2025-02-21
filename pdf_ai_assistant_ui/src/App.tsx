@@ -26,7 +26,7 @@ function App() {
 
 		try {
 			const response = await sendDataToServer(inputValue);
-			setResponseMessage(`✅ ${response.ai_response}`);
+			setResponseMessage(`${response.ai_response}`);
 		} catch (error) {
 			setResponseMessage("❌ Error al enviar, intenta de nuevo.");
 		} finally {
@@ -56,7 +56,7 @@ function App() {
 					</span>
 					<h1 className="header-title">Employee Finder Assistant</h1>
 
-					<div className="main-content">
+					<div className="main-container">
 						<div className={mainContainerClass}>
 							<div className="input-section">
 								<textarea

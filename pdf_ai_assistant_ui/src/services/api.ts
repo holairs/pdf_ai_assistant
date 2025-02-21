@@ -8,9 +8,9 @@ export async function sendDataToServer(data: string) {
 
     const response = await axios.post(
       API_URL,
-      JSON.stringify({ prompt: data }),  // 📌 Asegura que se envía un JSON válido
+      JSON.stringify({ prompt: data }),
       {
-        headers: { "Content-Type": "application/json" },  // 📌 Agregar encabezado obligatorio
+        headers: { "Content-Type": "application/json" },
       }
     );
 

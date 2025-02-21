@@ -34,7 +34,9 @@ def ai_consult(data: dict):
                         "cuando te pida varias personas otorgalas, cuando te pida"
                         "solo una persona, solo da la inforamcion de una persona"
                         "todo en español y en formato markdown sin poner "
-                        "la triple comilla que indica que es markdown al inicio  y a al final"
+                        "la triple comilla que indica que es markdown al inicio  y a al final, y que lo des como un listado"
+                        "cada persona con su titulo y analisis, pero no mezcles a las personas"
+                        "pon a cada persona en su propio espacio"
                     )
                 },
                 {

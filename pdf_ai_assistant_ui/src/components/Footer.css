@@ -1,7 +1,5 @@
-/* src/components/Footer.css */
-
 .app-footer {
-  background: var(--surface-1);
+  /*background: var(--surface-1);*/
   color: var(--surface-3);
   padding: 1rem;
   text-align: center;
@@ -28,3 +26,4 @@
 .footer-links a:hover {
   color: var(--active-color);
 }
+
