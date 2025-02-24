@@ -1,6 +1,7 @@
 fastapi[standard]
 PyPDF2
 openai
-markdown
 fpdf
 asyncpg
+markdown2
+weasyprint

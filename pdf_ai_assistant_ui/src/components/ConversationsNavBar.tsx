@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import { getHistory } from "../services/api";
-import "./ChatNavbar.css";
+import "./ConversationsNavBar.css";
 
 interface Chat {
 	id: number;
 	prompt: string;
+	title: string;
+	profile: string;
 	created_at: string;
 }
 
-function ChatNavbar() {
-	const [chats, setChats] = useState<Chat[]>([]);
+function ConversationsNavBar() {
+	const [conversations, setConversations] = useState<Chat[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
@@ -17,7 +19,7 @@ function ChatNavbar() {
 		const fetchChats = async () => {
 			try {
 				const response = await getHistory();
-				setChats(response);
+				setConversations(response);
 			} catch (err) {
 				console.error("❌ Error al obtener el historial:", err);
 				setError("Error al cargar conversaciones.");
@@ -37,9 +39,9 @@ function ChatNavbar() {
 			{error && <p className="error">{error}</p>}
 
 			<ul className="chat-list">
-				{chats.map((chat) => (
+				{conversations.map((chat) => (
 					<li key={chat.id} className="chat-item">
-						<div className="chat-title">{chat.prompt}</div>
+						<div className="chat-title">{chat.title}</div>
 						<div className="chat-last-message">Última consulta realizada el {new Date(chat.created_at).toLocaleString()}</div>
 					</li>
 				))}
@@ -48,4 +50,4 @@ function ChatNavbar() {
 	);
 }
 
-export default ChatNavbar;
+export default ConversationsNavBar;

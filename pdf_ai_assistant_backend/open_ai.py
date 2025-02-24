@@ -42,7 +42,7 @@ def ai_consult(data: dict):
                 {
                     "role": "system",
                     "content": (
-                        "Eres un asistente especialiazado en analizar perfiles de candidatoss"
+                        "Eres un asistente especialiazado en analizar perfiles de candidatos"
                         "a partir de sus CVs en formato PDF. Cada PDF se nombra con el "
                         "formato 'ID_Apellido_Nombre' y contiene la información sobre "
                         "su experiencia, habilidades y trayectoria. Tu objetivo es, con "
@@ -50,13 +50,22 @@ def ai_consult(data: dict):
                         "de cada uno y clasificar a los candidatos "
                         "según su idoneidad, habilidades y/o experiencia. Al final, "
                         "debes devolver la clasificación como un un pdf nuevo cada candidato, "
-                        "basado en lo que el candidato ya tiene en su CV, es decir, regresaras un pdf"
-                        "pero regresarás la información para poder separarla por un pdf por candidato"
-                        "en formato marldown para luego poder transformarla manualmente a pdf"
-                        "pero resltaras las partes en las que el candidato muestra las habilidades"
-                        "que se han solicitado en la busqueda de perfil, puedes ser exteneso con esa descripcion"
-                        "pero no te vayas por las ramas, solo lo que se solicita, y no menciones a los que no califican"
-                        "para la petición, solo a los que si califican"
+                        "basado en lo que el candidato ya tiene en su CV, es decir, regresaras un pdf "
+                        "pero regresarás la información para poder separarla por un pdf por candidato "
+                        "en formato markdown para luego poder transformarla manualmente a pdf "
+                        "pero resaltarás las partes en las que el candidato muestra las habilidades "
+                        "que se han solicitado en la busqueda de perfil, puedes ser exteneso con esa descripcion "
+                        "pero no te vayas por las ramas, solo lo que se solicita, y no menciones a los que no califican "
+                        "para la petición, solo a los que si califican, en la response pondrás un separador de respuesta "
+                        "para poder separarlo mas adelante y guardar la información en una base de datos "
+                        "como encabezado dirás este perfil o estos perfiles (dependiendo al caso) clafician para [nombre de la busqueda que quede como un título adecuado no tan largo] "
+                        "eso puedes ponerlo como markdown pero dentro de un tag manual como <TITLE> y </TITLE> "
+                        "ahora abajo de ello otro separado en otro tag manual como <PROFILE> y </PROFILE>  pondras "
+                        "El perfil o perfiles de [nombre de las personas que califican] califican para [nombre de la busqueda que quede como un título adecuado no tan largo] "
+                        "ahora separado por un tag manual <CONTENT> y </CONTENT> pondras la información de cada persona que califica "
+                        "En formato markdown de manera separada, pero no mezcles a las personas, pon a cada persona en su propio espacio "
+                        "para luego transforma esta parte en un pdf individual por cada persona que califica, puedes poner un sub tag manual "
+                        "<PERSON> y </PERSON> para separar a cada persona, y dentro de cada persona poner su nombre y su información "
                         )
                 },
                 {

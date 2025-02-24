@@ -1,7 +1,8 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from process_data import process_pdfs 
+from utils.generate_pdf import generate_pdf_from_db
 import asyncpg
 
 app = FastAPI()
@@ -31,7 +32,6 @@ async def request_employee(request: Request):
 
         print("🎯 Procesando PDFs con el prompt:", prompt)
         result = await process_pdfs(prompt)
-        
         print("✅ Respuesta generada:", result)
         return JSONResponse(content=result)
 
@@ -43,23 +43,21 @@ async def request_employee(request: Request):
 async def get_history():
     """Devuelve el historial de conversaciones guardadas en PostgreSQL."""
     conn = await asyncpg.connect(DATABASE_URL)
-    conversations = await conn.fetch("SELECT id, prompt, created_at FROM conversations ORDER BY created_at DESC")
+    conversations = await conn.fetch("SELECT id, prompt, created_at, title, profile FROM conversations ORDER BY created_at DESC")
     await conn.close()
 
-    return [{"id": conv["id"], "prompt": conv["prompt"], "created_at": conv["created_at"]} for conv in conversations]
-
+    return [{"id": conv["id"], "prompt": conv["prompt"], "created_at": conv["created_at"], "title": conv["title"], "profile": conv["profile"]} for conv in conversations]
 
 @app.get("/download/{conversation_id}/{candidate_name}")
 async def download_pdf(conversation_id: int, candidate_name: str):
-    """Devuelve el PDF de un candidato almacenado en PostgreSQL."""
-    conn = await asyncpg.connect(DATABASE_URL)
-    pdf_data = await conn.fetchval(
-        "SELECT pdf_data FROM pdf_files WHERE conversation_id = $1 AND candidate_name = $2",
-        conversation_id, candidate_name
-    )
-    await conn.close()
+    """Genera un PDF desde la BD y lo devuelve como archivo descargable."""
+    try:
+        pdf_bytes = await generate_pdf_from_db(conversation_id, candidate_name)
+        if not pdf_bytes:
+            raise HTTPException(status_code=404, detail="No se encontró el archivo PDF.")
 
-    if pdf_data:
-        return Response(content=pdf_data, media_type="application/pdf", headers={"Content-Disposition": f"attachment; filename={candidate_name}.pdf"})
-    return JSONResponse(content={"error": "Archivo no encontrado"}, status_code=404)
-
+        return Response(content=pdf_bytes, media_type="application/pdf",
+                        headers={"Content-Disposition": f"attachment; filename={candidate_name}.pdf"})
+    except Exception as e:
+        print(f"❌ Error al generar PDF: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

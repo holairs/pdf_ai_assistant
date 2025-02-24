@@ -2,63 +2,65 @@ import os
 import asyncpg
 import re
 from PyPDF2 import PdfReader
-from fpdf import FPDF
 from open_ai import ai_consult
 
 DATABASE_URL = 'postgresql://holairs:Panic!@localhost:5432/ai_assistant'
-# PDF_FOLDER = os.path.join(os.path.expanduser("~"), "Downloads/CVS_Test/")
-PDF_FOLDER = os.path.join(os.path.expanduser("~"), "Downloads/CVS_Test_minimal/")
+PDF_FOLDER = os.path.join(os.path.expanduser("~"), "Downloads/CVS_Test/")
 
-async def save_conversation(prompt: str, response_markdown: str):
-    """Guarda la conversación en la base de datos y devuelve el ID."""
+async def extract_tags(text: str):
+    """Extrae datos de los tags en la respuesta de OpenAI."""
+    title_match = re.search(r"<TITLE>(.*?)</TITLE>", text, re.DOTALL)
+    profile_match = re.search(r"<PROFILE>(.*?)</PROFILE>", text, re.DOTALL)
+    content_match = re.findall(r"<PERSON>(.*?)</PERSON>", text, re.DOTALL)  # Lista de candidatos
+
+    title = title_match.group(1).strip() if title_match else "Sin título"
+    profile = profile_match.group(1).strip() if profile_match else "Sin perfil"
+    persons = [p.strip() for p in content_match] if content_match else []
+
+    return title, profile, persons
+
+def extract_candidate_name(person_text: str):
+    """Extrae el nombre del candidato de la sección <PERSON>."""
+    # Intentar con el formato: **Nombre:** Nombre Apellido
+    name_match = re.search(r"\*\*Nombre:\*\* (.*?)\n", person_text)
+    
+    if name_match:
+        return name_match.group(1).strip()
+
+    # Si no se encontró con "Nombre:", buscar el primer texto en negrita (**Texto**)
+    bold_match = re.search(r"\*\*(.*?)\*\*", person_text)
+    
+    if bold_match:
+        return bold_match.group(1).strip()
+
+    return "Desconocido"  # Si no se encuentra nada, usar "Desconocido"
+
+async def save_conversation(prompt: str, title: str, profile: str):
+    """Guarda la conversación en la base de datos y devuelve su ID."""
     conn = await asyncpg.connect(DATABASE_URL)
     conversation_id = await conn.fetchval(
-        "INSERT INTO conversations (prompt, response_markdown) VALUES ($1, $2) RETURNING id",
-        prompt, response_markdown
+        "INSERT INTO conversations (prompt, title, profile) VALUES ($1, $2, $3) RETURNING id",
+        prompt, title, profile
     )
     await conn.close()
     return conversation_id
 
-async def save_pdf(conversation_id: int, candidate_name: str, pdf_bytes: bytes):
-    """Guarda el PDF generado en la base de datos."""
+async def save_pdf(conversation_id: int, candidate_name: str, markdown_content: str):
+    """Guarda el markdown de un candidato en la base de datos."""
     conn = await asyncpg.connect(DATABASE_URL)
     await conn.execute(
-        "INSERT INTO pdf_files (conversation_id, candidate_name, pdf_data) VALUES ($1, $2, $3)",
-        conversation_id, candidate_name, pdf_bytes
+        "INSERT INTO pdf_files (conversation_id, candidate_name, markdown_content) VALUES ($1, $2, $3)",
+        conversation_id, candidate_name, markdown_content
     )
     await conn.close()
 
-def markdown_to_pdfs(markdown_text: str):
-    """Convierte el Markdown en PDFs y devuelve los binarios."""
-    pdf_files = {}
-
-    candidate_sections = re.split(r"##\s+", markdown_text)  # Separar candidatos por título ##
-
-    for section in candidate_sections:
-        if not section.strip():
-            continue
-
-        lines = section.split("\n")
-        candidate_name = lines[0].strip().replace(" ", "_")
-        content = "\n".join(lines[1:])
-
-        pdf = FPDF()
-        pdf.set_auto_page_break(auto=True, margin=15)
-        pdf.add_page()
-        pdf.set_font("Arial", size=12)
-        pdf.multi_cell(190, 10, content)
-
-        pdf_bytes = pdf.output(dest="S").encode("latin1")  # Obtener PDF en bytes
-        pdf_files[candidate_name] = pdf_bytes
-
-    return pdf_files
-
 async def process_pdfs(prompt: str):
+    """Procesa PDFs, obtiene respuesta de OpenAI y almacena los datos."""
     pdf_data = {}
-    open_ai_response = "Error: No se pudo procesar ningún PDF"  # Defatult value
+    open_ai_response = "Error: No se pudo procesar ningún PDF"
 
     try:
-        # List directory PDFs 
+        # Leer los PDFs en la carpeta
         for filename in os.listdir(PDF_FOLDER):
             if filename.endswith(".pdf"):
                 pdf_path = os.path.join(PDF_FOLDER, filename)
@@ -66,26 +68,32 @@ async def process_pdfs(prompt: str):
                     with open(pdf_path, "rb") as pdf_file:
                         reader = PdfReader(pdf_file)
                         text = "\n".join([page.extract_text() or "" for page in reader.pages])
-
-                        # Contents as str
-                        if not isinstance(text, str):
-                            raise ValueError(f"The {filename} content is not a valid str.")
-
                         pdf_data[filename] = text
                 except Exception as e:
-                    print(f"❌ Error while processing {filename}: {e}")
+                    print(f"❌ Error procesando {filename}: {e}")
 
         if pdf_data:
-            formatted_data = {
-                "prompt": prompt,
-                "pdfs": pdf_data
-            }
-            open_ai_response = ai_consult(formatted_data)  # Formated values
-            save_pdf(1, "Test", open_ai_response.encode("utf-8"))
+            # Obtener respuesta de OpenAI
+            formatted_data = {"prompt": prompt, "pdfs": pdf_data}
+            open_ai_response = ai_consult(formatted_data)
+
+            # Extraer información de los tags en la respuesta
+            title, profile, persons = await extract_tags(open_ai_response)
+
+            # Guardar conversación en la base de datos
+            conversation_id = await save_conversation(prompt, title, profile)
+
+            # Guardar cada persona en la tabla `pdf_files`
+            for person in persons:
+                candidate_name = extract_candidate_name(person)  # Extraer nombre correctamente
+                await save_pdf(conversation_id, candidate_name, person)
+
+            return {"conversation_id": conversation_id, "title": title, "profile": profile}
+
         else:
-            print("⚠️ Not enough files to process.")
+            print("⚠️ No hay suficientes archivos para procesar.")
+            return {"error": "No hay archivos PDF válidos en la carpeta."}
 
     except Exception as e:
-        print(f"❌ Error in FastAPI: {e}")
-
-    return {"ai_response": open_ai_response}
+        print(f"❌ Error en FastAPI: {e}")
+        return {"error": str(e)}

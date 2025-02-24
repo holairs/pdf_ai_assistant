@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import "./App.css";
-import { sendDataToServer } from "./services/api.js";
+import { downloadPdf, sendDataToServer } from "./services/api.js";
 import "./components/pixel-canvas.js";
 import ReactMarkdown from 'react-markdown';
-import ChatNavbar from "./components/ChatNavBar.js";
-import Footer from "./components/Footer.js";
+import ConversationsNavBar from "./components/ConversationsNavBar.tsx";
+import Footer from "./components/Footer.tsx";
 
 function App() {
 	const [inputValue, setInputValue] = useState("");
@@ -26,7 +26,8 @@ function App() {
 
 		try {
 			const response = await sendDataToServer(inputValue);
-			setResponseMessage(`${response.ai_response}`);
+			//concatenar con title y profile
+			setResponseMessage(`${response.title} \n ${response.profile}`);
 		} catch (error) {
 			setResponseMessage("❌ Error al enviar, intenta de nuevo.");
 		} finally {
@@ -46,7 +47,7 @@ function App() {
 
 	return (
 		<div className="app-container">
-			<ChatNavbar />
+			<ConversationsNavBar />
 
 			{/* CONTENIDO PRINCIPAL CENTRADO */}
 			<div className="content-wrapper">
@@ -87,6 +88,10 @@ function App() {
 								<div className="response-section">
 									<div className="response">
 										<ReactMarkdown>{responseMessage}</ReactMarkdown>
+									</div>
+									<div className="">
+									<br/>
+									<button onClick={downloadPdf(response.conversationId)}>descargar</button>
 									</div>
 								</div>
 							)}
