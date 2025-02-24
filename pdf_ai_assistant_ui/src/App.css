@@ -94,11 +94,11 @@ body {
   flex-grow: 1;
 }
 
-.main-container.has-response {
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-start;
-}
+/*.main-container.has-response {*/
+/*  flex-direction: row;*/
+/*  justify-content: space-between;*/
+/*  align-items: flex-start;*/
+/*}*/
 
 /* Sección de input */
 .input-section {
@@ -214,25 +214,82 @@ pixel-canvas {
   animation: fadeIn 0.5s ease-out;
 }
 
+/* 🔹 Sección de Descarga con Íconos */
 .download-buttons {
     margin-top: 20px;
     text-align: start;
+}
+
+.download-item {
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
 }
 
 .download-btn {
     background-color: #007BFF;
     color: white;
     border: none;
-    padding: 10px 15px;
+    padding: 8px 10px;
     font-size: 16px;
-    margin: 5px;
     cursor: pointer;
     border-radius: 5px;
     transition: background 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
 }
 
 .download-btn:hover {
     background-color: #0056b3;
+}
+
+.icon {
+    font-size: 18px;
+}
+
+.candidate-name {
+    font-size: 16px;
+    color: white;
+}
+
+/* 🔹 Sección de Reset */
+.reset-section {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.reset-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
+}
+
+.reset-btn:hover {
+    background-color: #218838;
+}
+
+.reset-btn .icon {
+    margin-right: 5px;
+    font-size: 18px;
+}
+
+/* 🔹 Ajuste de layout para ocupar toda la pantalla */
+.main-container.has-response {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 }
 
 
