@@ -29,24 +29,24 @@ def markdown_to_pdf(candidate_name: str, markdown_content: str):
         <style>
             body {{
                 font-family: Arial, sans-serif;
-                font-size: 18px; /* 🔹 Aumentamos la fuente */
-                margin: 40px; /* 🔹 Más margen */
+                font-size: 18px; /* 🔹 Tamaño de fuente más grande */
+                margin: 40px;
                 padding: 0;
             }}
             .header {{
                 display: flex;
-                align-items: flex-end; /* 🔹 Alinea al fondo */
+                align-items: flex-end;
                 justify-content: space-between;
                 border-bottom: 3px solid #333;
                 padding-bottom: 5px;
                 margin-bottom: 30px;
             }}
             .logo {{
-                width: 140px; /* 🔹 Ajustamos el tamaño del logo */
+                width: 140px;
                 height: auto;
             }}
             .name {{
-                font-size: 28px; /* 🔹 Aumentamos el tamaño del nombre */
+                font-size: 28px;
                 font-weight: bold;
                 color: #333;
                 margin-bottom: 0;
@@ -61,6 +61,7 @@ def markdown_to_pdf(candidate_name: str, markdown_content: str):
             }}
             ul {{
                 padding-left: 30px;
+                list-style-type: disc !important; /* 🔹 Fuerza los bullets como círculos */
             }}
             li {{
                 margin-bottom: 10px;

@@ -6,7 +6,7 @@ import ReactMarkdown from "react-markdown";
 import ConversationsNavBar from "./components/ConversationsNavBar.tsx";
 import Footer from "./components/Footer.tsx";
 
-function App() {
+function Test() {
 	const [inputValue, setInputValue] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [responseMessage, setResponseMessage] = useState("");

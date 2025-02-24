@@ -58,6 +58,7 @@ async def process_pdfs(prompt: str):
     """Procesa PDFs, obtiene respuesta de OpenAI y almacena los datos."""
     pdf_data = {}
     open_ai_response = "Error: No se pudo procesar ningún PDF"
+    candidates_list = []
 
     try:
         # Leer los PDFs en la carpeta
@@ -85,10 +86,18 @@ async def process_pdfs(prompt: str):
 
             # Guardar cada persona en la tabla `pdf_files`
             for person in persons:
-                candidate_name = extract_candidate_name(person)  # Extraer nombre correctamente
+                candidate_name = extract_candidate_name(person)
                 await save_pdf(conversation_id, candidate_name, person)
 
-            return {"conversation_id": conversation_id, "title": title, "profile": profile}
+                # Añadir a la lista de candidatos para el UI
+                candidates_list.append({"name": candidate_name, "conversationId": conversation_id})
+
+            return {
+                "conversationId": conversation_id,
+                "title": title,
+                "profile": profile,
+                "candidates": candidates_list,  # Agregamos la lista de candidatos aquí
+            }
 
         else:
             print("⚠️ No hay suficientes archivos para procesar.")
