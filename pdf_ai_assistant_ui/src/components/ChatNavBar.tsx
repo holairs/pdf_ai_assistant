@@ -17,7 +17,6 @@ function ChatNavbar() {
 		const fetchChats = async () => {
 			try {
 				const response = await getHistory();
-				console.log("✅ Historial cargado:", response);
 				setChats(response);
 			} catch (err) {
 				console.error("❌ Error al obtener el historial:", err);

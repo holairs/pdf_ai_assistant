@@ -6,6 +6,8 @@ from fpdf import FPDF
 from open_ai import ai_consult
 
 DATABASE_URL = 'postgresql://holairs:Panic!@localhost:5432/ai_assistant'
+# PDF_FOLDER = os.path.join(os.path.expanduser("~"), "Downloads/CVS_Test/")
+PDF_FOLDER = os.path.join(os.path.expanduser("~"), "Downloads/CVS_Test_minimal/")
 
 async def save_conversation(prompt: str, response_markdown: str):
     """Guarda la conversación en la base de datos y devuelve el ID."""
@@ -52,11 +54,11 @@ def markdown_to_pdfs(markdown_text: str):
     return pdf_files
 
 async def process_pdfs(prompt: str):
-    """Procesa los PDFs, almacena la respuesta y los PDFs en PostgreSQL."""
     pdf_data = {}
-    open_ai_response = "Error: No se pudo procesar ningún PDF"
+    open_ai_response = "Error: No se pudo procesar ningún PDF"  # Defatult value
 
     try:
+        # List directory PDFs 
         for filename in os.listdir(PDF_FOLDER):
             if filename.endswith(".pdf"):
                 pdf_path = os.path.join(PDF_FOLDER, filename)
@@ -64,31 +66,26 @@ async def process_pdfs(prompt: str):
                     with open(pdf_path, "rb") as pdf_file:
                         reader = PdfReader(pdf_file)
                         text = "\n".join([page.extract_text() or "" for page in reader.pages])
+
+                        # Contents as str
+                        if not isinstance(text, str):
+                            raise ValueError(f"The {filename} content is not a valid str.")
+
                         pdf_data[filename] = text
                 except Exception as e:
-                    print(f"❌ Error procesando {filename}: {e}")
+                    print(f"❌ Error while processing {filename}: {e}")
 
         if pdf_data:
-            formatted_data = {"prompt": prompt, "pdfs": pdf_data}
-            open_ai_response = ai_consult(formatted_data)
-
-            # Guardar la conversación en la base de datos
-            conversation_id = await save_conversation(prompt, open_ai_response)
-
-            # Convertir Markdown en PDFs y almacenarlos
-            pdf_files = markdown_to_pdfs(open_ai_response)
-            for candidate_name, pdf_bytes in pdf_files.items():
-                await save_pdf(conversation_id, candidate_name, pdf_bytes)
-
-            return {
-                "conversation_id": conversation_id,
-                "ai_response": f"```markdown\n{open_ai_response}\n```"
+            formatted_data = {
+                "prompt": prompt,
+                "pdfs": pdf_data
             }
-
+            open_ai_response = ai_consult(formatted_data)  # Formated values
+            save_pdf(1, "Test", open_ai_response.encode("utf-8"))
         else:
-            print("⚠️ No hay suficientes archivos para procesar.")
-            return {"error": "No hay archivos PDF válidos en la carpeta."}
+            print("⚠️ Not enough files to process.")
 
     except Exception as e:
-        print(f"❌ Error en FastAPI: {e}")
-        return {"error": str(e)}
+        print(f"❌ Error in FastAPI: {e}")
+
+    return {"ai_response": open_ai_response}
