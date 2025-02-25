@@ -35,6 +35,22 @@ def extract_candidate_name(person_text: str):
 
     return "Desconocido"  # Si no se encuentra nada, usar "Desconocido"
 
+def extract_candidate_calification(person_text: str):
+    """Extrae el nombre del candidato de la sección <PERSON>."""
+    # Intentar con el formato: **Nombre:** Nombre Apellido
+    calification_match = re.search(r"\*\*Calificación:\*\* (.*?)\n", person_text)
+    
+    if calification_match:
+        return calification_match.group(1).strip()
+
+    # Si no se encontró con "Nombre:", buscar el primer texto en negrita (**Texto**)
+    bold_match = re.search(r"\*\*(.*?)\*\*", person_text)
+    
+    if bold_match:
+        return bold_match.group(1).strip()
+
+    return "Desconocido"  # Si no se encuentra nada, usar "Desconocido"
+
 async def save_conversation(prompt: str, title: str, profile: str):
     """Guarda la conversación en la base de datos y devuelve su ID."""
     conn = await asyncpg.connect(DATABASE_URL)
@@ -87,10 +103,11 @@ async def process_pdfs(prompt: str):
             # Guardar cada persona en la tabla `pdf_files`
             for person in persons:
                 candidate_name = extract_candidate_name(person)
+                candidate_calification = extract_candidate_calification(person)
                 await save_pdf(conversation_id, candidate_name, person)
 
                 # Añadir a la lista de candidatos para el UI
-                candidates_list.append({"name": candidate_name, "conversationId": conversation_id})
+                candidates_list.append({"name": candidate_name, "calification": candidate_calification, "conversationId": conversation_id})
 
             return {
                 "conversationId": conversation_id,

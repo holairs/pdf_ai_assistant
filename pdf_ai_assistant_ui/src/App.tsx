@@ -28,7 +28,7 @@ function App() {
 
 					// Transformar los datos al formato correcto
 					setCandidates(processedProfiles.map(profile => ({
-							name: profile.candidateName, // Ajusta la clave correctamente
+							name: profile.candidateName,
 							conversationId: conversationId
 					})));
 			} catch (error) {
