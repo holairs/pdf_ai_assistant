@@ -10,7 +10,11 @@ interface Chat {
 	created_at: string;
 }
 
-function ConversationsNavBar() {
+interface ConversationsNavBarProps {
+	onSelectConversation: (title: string, profile: string, conversationId: number) => void;
+}
+
+function ConversationsNavBar({ onSelectConversation }: ConversationsNavBarProps) {
 	const [conversations, setConversations] = useState<Chat[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -40,9 +44,15 @@ function ConversationsNavBar() {
 
 			<ul className="chat-list">
 				{conversations.map((chat) => (
-					<li key={chat.id} className="chat-item">
+					<li
+						key={chat.id}
+						className="chat-item"
+						onClick={() => onSelectConversation(chat.title, chat.profile, chat.id)}
+					>
 						<div className="chat-title">{chat.title}</div>
-						<div className="chat-last-message">Última consulta realizada el {new Date(chat.created_at).toLocaleString()}</div>
+						<div className="chat-last-message">
+							Última consulta realizada el {new Date(chat.created_at).toLocaleString()}
+						</div>
 					</li>
 				))}
 			</ul>

@@ -1,13 +1,13 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from process_data import process_pdfs 
 from utils.generate_pdf import generate_pdf_from_db
+from db_config import get_db
 import asyncpg
 
 app = FastAPI()
 DATABASE_URL = 'postgresql://holairs:Panic!@localhost:5432/ai_assistant'
-
 # CORS Config
 app.add_middleware(
     CORSMiddleware,
@@ -47,6 +47,18 @@ async def get_history():
     await conn.close()
 
     return [{"id": conv["id"], "prompt": conv["prompt"], "created_at": conv["created_at"], "title": conv["title"], "profile": conv["profile"]} for conv in conversations]
+
+@app.get("/get_processed_profiles/{conversation_id}")
+async def get_processed_profiles(conversation_id: int):
+    """Devuelve los candidatos asociados a una conversación."""
+    conn = await asyncpg.connect(DATABASE_URL)
+    processed_profiles = await conn.fetch(
+        "SELECT candidate_name FROM pdf_files WHERE conversation_id = $1",
+        conversation_id
+    )
+    await conn.close()
+
+    return [{"candidateName": conv["candidate_name"]} for conv in processed_profiles]
 
 @app.get("/download/{conversation_id}/{candidate_name}")
 async def download_pdf(conversation_id: int, candidate_name: str):

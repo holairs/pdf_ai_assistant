@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import "./App.css";
-import { downloadPdf, sendDataToServer } from "./services/api.js";
+import { downloadPdf, getProcessedProfiles, sendDataToServer } from "./services/api.js";
 import "./components/pixel-canvas.js";
 import ReactMarkdown from "react-markdown";
 import ConversationsNavBar from "./components/ConversationsNavBar.tsx";
@@ -16,6 +16,28 @@ function App() {
 
   // Referencia al pixel-canvas
   const pixelCanvasRef = useRef(null);
+
+	const handleSelectConversation = async (title: string, profile: string, conversationId: number) => {
+			setResponseMessage(`${title} \n ${profile}`);
+			console.log("🔍 Buscando perfiles procesados para la conversación:", conversationId);
+
+			try {
+					const processedProfiles = await getProcessedProfiles(conversationId);
+
+					console.log("✅ Perfiles obtenidos:", processedProfiles);
+
+					// Transformar los datos al formato correcto
+					setCandidates(processedProfiles.map(profile => ({
+							name: profile.candidateName, // Ajusta la clave correctamente
+							conversationId: conversationId
+					})));
+			} catch (error) {
+					console.error("❌ Error al obtener los perfiles procesados:", error);
+					setCandidates([]); // Limpia la lista en caso de error
+			}
+
+			setShowInput(false);
+	};
 
   const handleSend = async () => {
     setLoading(true);
@@ -66,7 +88,7 @@ function App() {
 
   return (
     <div className="app-container">
-      <ConversationsNavBar />
+			<ConversationsNavBar onSelectConversation={handleSelectConversation} />
 
       <div className="content-wrapper">
         <div className="wrapper">
@@ -108,7 +130,7 @@ function App() {
 
                 <div className="reset-section">
                   <button className="reset-btn" onClick={handleReset}>
-                    <FaRedo className="icon" /> Continuar con la consulta
+                    <FaRedo className="icon" /> Nueva Consulta
                   </button>
                 </div>
 

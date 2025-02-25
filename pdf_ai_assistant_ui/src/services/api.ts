@@ -14,7 +14,8 @@ export async function sendDataToServer(data: string) {
 
 		console.log("✅ Respuesta recibida:", response.data);
 		return response.data;
-	} catch (error: any) { console.error("❌ Error al enviar los datos:", error.message || error);
+	} catch (error: any) {
+		console.error("❌ Error al enviar los datos:", error.message || error);
 		throw error;
 	}
 }
@@ -22,12 +23,21 @@ export async function sendDataToServer(data: string) {
 export async function getHistory(): Promise<{ id: number; prompt: string; title: string; profile: string; created_at: string }[]> {
 	try {
 		const response = await axios.get(`${API_URL}/history`);
-		console.log("✅ Historial cargado:", response.data);
 		return response.data; // Debe ser un array
 	} catch (error) {
 		console.error("❌ Error al obtener historial:", error);
 		return []; // Devuelve un array vacío en caso de error
 	}
+}
+
+export async function getProcessedProfiles(conversationId: number): Promise<{ candidateName: string }[]> {
+    try {
+        const response = await axios.get(`${API_URL}/get_processed_profiles/${conversationId}`);
+        return response.data;
+    } catch (error) {
+        console.error("❌ Error al obtener los perfiles de la conversación:", error);
+        return [];
+    }
 }
 
 export async function downloadPdf(conversationId: number, candidateName: string) {
