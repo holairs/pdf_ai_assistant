@@ -184,8 +184,8 @@ pixel-canvas {
 }
 
 .reset-btn {
-  background-color: #28a745;
-  color: white;
+  background-color: #fde047;
+  color: black;
   border: none;
   padding: 10px 15px;
   font-size: 16px;
@@ -198,7 +198,8 @@ pixel-canvas {
 }
 
 .reset-btn:hover {
-  background-color: #218838;
+  background-color: #eab300;
+	color: black;
 }
 
 .reset-btn .icon {
@@ -211,6 +212,7 @@ pixel-canvas {
   width: 100%;
   text-align: left;
   margin-top: 0;
+	padding-bottom: 150px;
 }
 
 .download-buttons h3 {
@@ -224,7 +226,7 @@ pixel-canvas {
 }
 
 .download-btn {
-  background-color: #007BFF;
+  background-color: #303030;
   color: white;
   border: none;
   padding: 8px 10px;
@@ -239,7 +241,8 @@ pixel-canvas {
 }
 
 .download-btn:hover {
-  background-color: #0056b3;
+  background-color: #fde047;
+	color: black;
 }
 
 .icon {
