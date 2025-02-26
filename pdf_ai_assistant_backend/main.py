@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from process_data import process_pdfs 
 from utils.generate_pdf import generate_pdf_from_db
-from db_config import get_db
 import asyncpg
 
 app = FastAPI()

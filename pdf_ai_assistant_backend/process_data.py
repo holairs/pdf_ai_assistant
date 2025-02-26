@@ -2,6 +2,9 @@ import os
 import asyncpg
 import re
 from PyPDF2 import PdfReader
+from agents.hr_agent import hr_analysis
+from agents.tec_agent import tec_analysis
+from agents.qa_agent import qa_analysis
 from open_ai import ai_consult
 
 DATABASE_URL = 'postgresql://holairs:Panic!@localhost:5432/ai_assistant'
@@ -106,8 +109,19 @@ async def process_pdfs(prompt: str):
                 candidate_calification = extract_candidate_calification(person)
                 await save_pdf(conversation_id, candidate_name, person)
 
+                hr_feedback = hr_analysis(person)  # Obtener análisis de RRHH
+                tec_feedback = tec_analysis(person)  # Obtener análisis técnico
+                qa_feedback = qa_analysis(person)  # Obtener análisis de QA
+
+                print(f"👥 {candidate_name}: {hr_feedback}")
+
                 # Añadir a la lista de candidatos para el UI
-                candidates_list.append({"name": candidate_name, "calification": candidate_calification, "conversationId": conversation_id})
+                candidates_list.append({
+                    "name": candidate_name,
+                    "calification": candidate_calification, 
+                    "hr_feedback": hr_feedback,
+                    "conversationId": conversation_id
+                    })
 
             return {
                 "conversationId": conversation_id,
